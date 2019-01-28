@@ -5,8 +5,10 @@ Plugin 'https://github.com/VundleVim/Vundle.vim.git'
 Plugin 'https://github.com/elixir-editors/vim-elixir.git'
 Plugin 'https://github.com/Yggdroot/indentLine.git'
 Plugin 'https://github.com/vim-scripts/indentpython.vim.git'
+Plugin 'https://github.com/vim-python/python-syntax.git'
 call vundle#end()
 filetype plugin indent on
+let g:python_highlight_all = 1
 
 set encoding=utf-8
 
