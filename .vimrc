@@ -46,4 +46,7 @@ set hl=l:MySearch
 
 " flagging unnecessary whitespace
 highlight BadWhitespace ctermbg=red guibg=darkred
-au BufRead,BufNewFile *.py,*.pyw,*.ex,*.exs match BadWhitespace /\s\+$/
+au BufRead,BufNewFile *.sh,*.py,*.pyw,*.ex,*.exs match BadWhitespace /\s\+$/
+
+" set indentation for shell scripts
+autocmd FileType shell setlocal expandtab shiftwidth=4 softtabstop=4
