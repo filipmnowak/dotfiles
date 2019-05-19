@@ -17,12 +17,10 @@ syntax enable
 color elflord
 
 " nasm syntax for asm sources by default
-au FileType asm set filetype=nasm
+autocmd FileType asm set filetype=nasm
 
 " open file in same line
-if has("autocmd")
-  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
-endif
+autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
 
 set undofile
 set undodir=~/.vim/undo
@@ -46,7 +44,7 @@ set hl=l:MySearch
 
 " flagging unnecessary whitespace
 highlight BadWhitespace ctermbg=red guibg=darkred
-au BufRead,BufNewFile *.sh,*.py,*.pyw,*.ex,*.exs match BadWhitespace /\s\+$/
+autocmd BufRead,BufNewFile *.sh,*.py,*.pyw,*.ex,*.exs match BadWhitespace /\s\+$/
 
 " set indentation for shell scripts
-autocmd FileType shell setlocal expandtab shiftwidth=4 softtabstop=4
+autocmd FileType sh setlocal tabstop=4 softtabstop=4 expandtab shiftwidth=4
