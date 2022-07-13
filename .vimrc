@@ -21,6 +21,7 @@ syntax enable
 color elflord
 
 " don't make a fuss out of mis-cased commands
+cabbr P p
 cabbr Q q
 cabbr W w
 cabbr WQ wq
@@ -39,3 +40,7 @@ autocmd BufRead,BufNewFile *.sh,*.py,*.pyw,*.ex,*.exs match BadWhitespace /\s\+$
 autocmd FileType sh setlocal tabstop=4 softtabstop=4 shiftwidth=4 expandtab
 " don't indent commented yaml
 autocmd FileType yaml setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab indentkeys-=0# indentkeys-=<:>
+
+vmap Y :w! ~/.vim/temp/buffer.txt<CR>
+vmap P :r! cat ~/.vim/temp/buffer.txt<CR>
+nmap P :r! cat ~/.vim/temp/buffer.txt<CR>
