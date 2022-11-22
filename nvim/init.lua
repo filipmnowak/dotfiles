@@ -142,6 +142,10 @@ return require('packer').startup(function(use)
   vim.cmd "highlight BadWhitespace ctermbg=red guibg=darkred"
   vim.cmd "autocmd BufRead,BufNewFile *.sh,*.py,*.pyw,*.ex,*.exs match BadWhitespace /\\s\\+$/"
 
+  vim.opt.tabstop = 2
+  vim.opt.shiftwidth = 2
+  vim.opt.expandtab = true
+
   -- automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins
   if packer_bootstrap then
