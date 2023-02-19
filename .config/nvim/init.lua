@@ -38,19 +38,12 @@ return require('packer').startup(function(use)
 
   use "lukas-reineke/indent-blankline.nvim"
 
-  -- setting up the elixir language server
-  -- you have to manually specify the entrypoint cmd for elixir-ls
-  require('lspconfig').elixirls.setup {
-    cmd = { "/opt/elixir-ls-0.12.0/language_server.sh" },
-    on_attach = on_attach
-  }
-
   -- `on_attach` callback will be called after a language server
   -- instance has been attached to an open buffer with matching filetype
   -- here we're setting key mappings for hover documentation, goto definitions, goto references, etc
   -- you may set those key mappings based on your own preference
   local on_attach = function(client, bufnr)
-    local opts = { noremap=true, silent=true }
+  local opts = { noremap=true, silent=true }
   
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
@@ -66,12 +59,37 @@ return require('packer').startup(function(use)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
   end
 
+  local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+  require('lspconfig').elixirls.setup {
+    cmd = { "/opt/elixir-ls-0.12.0/language_server.sh" },
+    on_attach = on_attach,
+    capabilities = capabilities
+  }
+
+  util = require "lspconfig/util"
+  require('lspconfig').gopls.setup {
+    cmd = {"gopls", "serve"},
+    on_attach = on_attach,
+    capabilities = capabilities,
+    filetypes = {"go", "gomod"},
+    root_dir = util.root_pattern("go.mod", ".git"),
+    settings = {
+      gopls = {
+        analyses = {
+          unusedparams = true,
+        },
+        staticcheck = true,
+      },
+    },
+  }
+
   require'nvim-treesitter.configs'.setup {
     ensure_installed = {
             "elixir",
             "heex",
             "eex",
-	    "go",
+            "go",
             "javascript",
             "typescript",
             "rust",
@@ -87,14 +105,6 @@ return require('packer').startup(function(use)
       disable = { "elixir" },
     },
 }
-
-  local capabilities = require('cmp_nvim_lsp').default_capabilities()
-  
-  require('lspconfig').elixirls.setup {
-    cmd = { "/opt/elixir-ls-0.12.0/language_server.sh" },
-    on_attach = on_attach,
-    capabilities = capabilities
-  }
 
   local cmp = require'cmp'
 
@@ -119,6 +129,7 @@ return require('packer').startup(function(use)
 
   require("indent_blankline").setup {
     -- for example, context is off by default, use this to turn it on
+    enabled = false,
     show_current_context = true,
     show_current_context_start = false,
     show_trailing_blankline_indent = false,
@@ -142,9 +153,13 @@ return require('packer').startup(function(use)
   vim.cmd "highlight BadWhitespace ctermbg=red guibg=darkred"
   vim.cmd "autocmd BufRead,BufNewFile *.sh,*.py,*.pyw,*.ex,*.exs match BadWhitespace /\\s\\+$/"
 
-  vim.opt.tabstop = 2
-  vim.opt.shiftwidth = 2
-  vim.opt.expandtab = true
+  vim.cmd "autocmd FileType python setlocal tabstop=2"
+  vim.cmd "autocmd FileType python setlocal shiftwidth=2"
+  vim.cmd "autocmd FileType python setlocal expandtab"
+
+  vim.cmd "autocmd FileType go setlocal tabstop=4"
+  vim.cmd "autocmd FileType go setlocal shiftwidth=4"
+  vim.cmd "autocmd FileType go setlocal noexpandtab"
 
   -- automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins
