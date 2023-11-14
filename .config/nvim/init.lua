@@ -151,6 +151,7 @@ return require('packer').startup(function(use)
   vim.cmd "set number"
 
   vim.cmd "highlight BadWhitespace ctermbg=red guibg=darkred"
+  vim.cmd "highlight Visual ctermbg=LightMagenta ctermfg=Yellow"
   vim.cmd "autocmd BufRead,BufNewFile *.sh,*.py,*.pyw,*.ex,*.exs match BadWhitespace /\\s\\+$/"
 
   vim.cmd "autocmd FileType python setlocal tabstop=2"
