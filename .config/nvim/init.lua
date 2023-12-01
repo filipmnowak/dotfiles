@@ -1,170 +1,237 @@
-local ensure_packer = function()
-  local fn = vim.fn
-  local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
-  if fn.empty(fn.glob(install_path)) > 0 then
-    fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
-    vim.cmd [[packadd packer.nvim]]
-    return true
-  end
-  return false
-end
+--[[
+git clone https://github.com/nvim-treesitter/nvim-treesitter.git ~/.config/nvim/plugins/nvim-treesitter
+git clone https://github.com/neovim/nvim-lspconfig.git ~/.config/nvim/pack/plugins/start/nvim-lspconfig
+git clone https://github.com/elixir-editors/vim-elixir.git ~/.config/nvim/pack/plugins/start/vim-elixir
+for r in nvim-cmp cmp-nvim-lsp cmp-buffer cmp-path cmp-cmdline cmp-vsnip vim-vsnip; do git clone https://github.com/hrsh7th/${r}.git ~/.config/nvim/pack/plugins/start/${r}; done
+git clone https://github.com/nvim-lua/plenary.nvim.git ~/.config/nvim/pack/plugins/start/plenary.nvim
+git clone https://github.com/nvim-telescope/telescope.nvim.git ~/.config/nvim/pack/plugins/start/telescope.nvim
+--]]
 
-local packer_bootstrap = ensure_packer()
+vim.cmd "set colorcolumn=128"
+vim.cmd "set ruler"
+vim.cmd "set number"
 
-return require('packer').startup(function(use)
-  use 'wbthomason/packer.nvim'
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all" (the five listed parsers should always be installed)
+  ensure_installed = {
+	  "awk",
+	  "cmake",
+	  "eex",
+	  "erlang",
+	  "elixir",
+	  "go",
+	  "haskell",
+	  "heex",
+	  "html",
+	  "javascript",
+	  "json",
+	  "lua",
+	  "luadoc",
+	  "rust",
+	  "typescript",
+	  "vim",
+	  "vimdoc",
+	  "yaml"
+  },
 
-  -- lsp config for elixir-ls support
-  use 'neovim/nvim-lspconfig'
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
 
-  -- cmp framework for auto-completion support
-  use 'hrsh7th/nvim-cmp'
+  -- Automatically install missing parsers when entering buffer
+  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+  auto_install = true,
 
-  -- install different completion source
-  use 'hrsh7th/cmp-nvim-lsp'
-  use 'hrsh7th/cmp-buffer'
-  use 'hrsh7th/cmp-path'
-  use 'hrsh7th/cmp-cmdline'
+  -- List of parsers to ignore installing (or "all")
+  -- ignore_install = { "javascript" },
 
-  -- you need a snippet engine for snippet support
-  -- here I'm using vsnip which can load snippets in vscode format
-  use 'hrsh7th/vim-vsnip'
-  use 'hrsh7th/cmp-vsnip'
+  ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
+  -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
 
-  -- treesitter for syntax highlighting and more
-  use 'nvim-treesitter/nvim-treesitter'
+  highlight = {
+    enable = true,
 
-  use 'elixir-editors/vim-elixir'
+    -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
+    -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
+    -- the name of the parser)
+    -- list of language that will be disabled
+    -- disable = { "c", "rust" },
+    -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
+    disable = function(lang, buf)
+        local max_filesize = 100 * 1024 -- 100 KB
+        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+        if ok and stats and stats.size > max_filesize then return true end
+	local _disable = {
+	  "lua",
+	  "luadoc",
+	  "xelixir"
+	}
+	for _, v in pairs(_disable) do
+          if v == lang then return true end
+	end
+    end,
 
-  use "lukas-reineke/indent-blankline.nvim"
-
-  -- `on_attach` callback will be called after a language server
-  -- instance has been attached to an open buffer with matching filetype
-  -- here we're setting key mappings for hover documentation, goto definitions, goto references, etc
-  -- you may set those key mappings based on your own preference
-  local on_attach = function(client, bufnr)
-  local opts = { noremap=true, silent=true }
-  
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>cr', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-f>', '<cmd>lua vim.lsp.buf.format()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>cd', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
-  end
-
-  local capabilities = require('cmp_nvim_lsp').default_capabilities()
-
-  require('lspconfig').elixirls.setup {
-    cmd = { "/opt/elixir-ls-0.12.0/language_server.sh" },
-    on_attach = on_attach,
-    capabilities = capabilities
-  }
-
-  util = require "lspconfig/util"
-  require('lspconfig').gopls.setup {
-    cmd = {"gopls", "serve"},
-    on_attach = on_attach,
-    capabilities = capabilities,
-    filetypes = {"go", "gomod"},
-    root_dir = util.root_pattern("go.mod", ".git"),
-    settings = {
-      gopls = {
-        analyses = {
-          unusedparams = true,
-        },
-        staticcheck = true,
-      },
-    },
-  }
-
-  require'nvim-treesitter.configs'.setup {
-    ensure_installed = {
-            "elixir",
-            "heex",
-            "eex",
-            "go",
-            "javascript",
-            "typescript",
-            "rust",
-            "ocaml",
-            "python",
-            "haskell"
-    },
-    -- ensure_installed = "all", -- install parsers for all supported languages
-    sync_install = false,
-    ignore_install = { },
-    highlight = {
-      enable = true,
-      disable = { "elixir" },
-    },
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
 }
 
-  local cmp = require'cmp'
+local feedkey = function(key, mode)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
+end
 
-  cmp.setup({
-    snippet = {
-      expand = function(args)
-        -- setting up snippet engine
-        -- this is for vsnip, if you're using other
-        -- snippet engine, please refer to the `nvim-cmp` guide
-        vim.fn["vsnip#anonymous"](args.body)
-      end,
-    },
-    mapping = {
-      ['<CR>'] = cmp.mapping.confirm({ select = true }),
-    },
-    sources = cmp.config.sources({
-      { name = 'nvim_lsp' },
-      { name = 'vsnip' }, -- For vsnip users.
-      { name = 'buffer' }
-    })
+-- Set up nvim-cmp.
+local cmp = require'cmp'
+
+cmp.setup({
+  snippet = {
+    -- REQUIRED - you must specify a snippet engine
+    expand = function(args)
+      vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+      -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+      -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+      -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+    end,
+  },
+  window = {
+    completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.abort(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    ["<Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+	cmp.select_next_item()
+      elseif vim.fn["vsnip#available"](1) == 1 then
+	feedkey("<Plug>(vsnip-expand-or-jump)", "")
+      elseif has_words_before() then
+	cmp.complete()
+      else
+	fallback()
+      end
+    end, { "i", "s" }),
+    ["<S-Tab>"] = cmp.mapping(function()
+      if cmp.visible() then
+	cmp.select_prev_item()
+      elseif vim.fn["vsnip#jumpable"](-1) == 1 then
+	feedkey("<Plug>(vsnip-jump-prev)", "")
+      end
+    end, { "i", "s" })
+  }),
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'vsnip' }, -- For vsnip users.
+    -- { name = 'luasnip' }, -- For luasnip users.
+    -- { name = 'ultisnips' }, -- For ultisnips users.
+    -- { name = 'snippy' }, -- For snippy users.
+  }, {
+    { name = 'buffer' },
   })
+})
 
-  require("indent_blankline").setup {
-    -- for example, context is off by default, use this to turn it on
-    enabled = false,
-    show_current_context = true,
-    show_current_context_start = false,
-    show_trailing_blankline_indent = false,
-    use_treesitter_scope = true,
-    viewport_buffer = 64,
-    indent_level = 10,
-    show_first_indent_level = true,
-    use_treesitter = true
+-- Set configuration for specific filetype.
+cmp.setup.filetype('gitcommit', {
+  sources = cmp.config.sources({
+    { name = 'git' }, -- You can specify the `git` source if [you were installed it](https://github.com/petertriho/cmp-git).
+  }, {
+    { name = 'buffer' },
+  })
+})
+
+-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline({ '/', '?' }, {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = {
+    { name = 'buffer' }
   }
+})
 
-  -- start at last cursor line
-  vim.api.nvim_create_autocmd(
-    "BufReadPost",
-    { command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g`\"" | endif]] }
-  )
+-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline(':', {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources({
+    { name = 'path' }
+  }, {
+    { name = 'cmdline' }
+  })
+})
 
-  vim.cmd "set colorcolumn=128"
-  vim.cmd "set ruler"
-  vim.cmd "set number"
+-- Set up lspconfig.
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-  vim.cmd "highlight BadWhitespace ctermbg=red guibg=darkred"
-  vim.cmd "highlight Visual ctermbg=LightMagenta ctermfg=Yellow"
-  vim.cmd "autocmd BufRead,BufNewFile *.sh,*.py,*.pyw,*.ex,*.exs match BadWhitespace /\\s\\+$/"
+---[[
+require('lspconfig').elixirls.setup {
+  cmd = { "/opt/elixir-ls-0.12.0/language_server.sh" },
+  -- on_attach = on_attach,
+  capabilities = capabilities
+}
+--]]
 
-  vim.cmd "autocmd FileType python setlocal tabstop=2"
-  vim.cmd "autocmd FileType python setlocal shiftwidth=2"
-  vim.cmd "autocmd FileType python setlocal expandtab"
-
-  vim.cmd "autocmd FileType go setlocal tabstop=4"
-  vim.cmd "autocmd FileType go setlocal shiftwidth=4"
-  vim.cmd "autocmd FileType go setlocal noexpandtab"
-
-  -- automatically set up your configuration after cloning packer.nvim
-  -- Put this at the end after all plugins
-  if packer_bootstrap then
-    require('packer').sync()
+---[[
+require('lspconfig').sumneko_lua.setup  {
+  cmd = { "/opt/lua-language-server-3.7.3/bin/lua-language-server", "--logpath", "~/.local/cache/lua-language-server-3.7.3" },
+  capabilities = capabilities,
+  on_init = function(client)
+    local path = client.workspace_folders[1].name
+    if not vim.loop.fs_stat(path..'/.luarc.json') and not vim.loop.fs_stat(path..'/.luarc.jsonc') then
+      client.config.settings = vim.tbl_deep_extend('force', client.config.settings, {
+        Lua = {
+          runtime = {
+            -- Tell the language server which version of Lua you're using
+            -- (most likely LuaJIT in the case of Neovim)
+            version = 'Lua 5.4'
+          },
+          telemetry = {
+            enable = false
+	  },
+          -- Make the server aware of Neovim runtime files
+          workspace = {
+            checkThirdParty = false,
+            library = {
+              vim.env.VIMRUNTIME
+              -- "${3rd}/luv/library"
+              -- "${3rd}/busted/library",
+            }
+            -- or pull in all of 'runtimepath'. NOTE: this is a lot slower
+            -- library = vim.api.nvim_get_runtime_file("", true)
+          }
+        }
+      })
+      client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+    end
+    return true
   end
-end)
+}
+--]]
+
+--[[
+require('telescope').setup{
+  defaults = {
+    -- Default configuration for telescope goes here:
+    -- config_key = value,
+    -- ..
+  },
+  pickers = {
+    -- Default configuration for builtin pickers goes here:
+    -- picker_name = {
+    --   picker_config_key = value,
+    --   ...
+    -- }
+    -- Now the picker_config_key will be applied every time you call this
+    -- builtin picker
+  },
+  extensions = {
+    -- Your extension configuration goes here:
+    -- extension_name = {
+    --   extension_config_key = value,
+    -- }
+    -- please take a look at the readme of the extension you want to configure
+  }
+}
+--]]
