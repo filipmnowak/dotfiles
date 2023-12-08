@@ -6,6 +6,7 @@ git clone https://github.com/elixir-editors/vim-elixir.git ~/.config/nvim/pack/p
 for r in nvim-cmp cmp-nvim-lsp cmp-buffer cmp-path cmp-cmdline cmp-vsnip vim-vsnip; do git clone https://github.com/hrsh7th/${r}.git ~/.config/nvim/pack/plugins/start/${r}; done
 git clone https://github.com/nvim-lua/plenary.nvim.git ~/.config/nvim/pack/plugins/start/plenary.nvim
 git clone https://github.com/nvim-telescope/telescope.nvim.git ~/.config/nvim/pack/plugins/start/telescope.nvim
+curl https://raw.githubusercontent.com/filipmnowak/dotfiles/master/.config/nvim/init.lua -o ~/.config/nvim/init.lua
 --]]
 
 vim.cmd "set colorcolumn=128"
