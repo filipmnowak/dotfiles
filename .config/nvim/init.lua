@@ -1,5 +1,5 @@
 --[[
-git clone https://github.com/nvim-treesitter/nvim-treesitter.git ~/.config/nvim/plugins/nvim-treesitter
+git clone https://github.com/nvim-treesitter/nvim-treesitter.git ~/.config/nvim/plugins/start/nvim-treesitter
 git clone https://github.com/neovim/nvim-lspconfig.git ~/.config/nvim/pack/plugins/start/nvim-lspconfig
 git clone https://github.com/elixir-editors/vim-elixir.git ~/.config/nvim/pack/plugins/start/vim-elixir
 for r in nvim-cmp cmp-nvim-lsp cmp-buffer cmp-path cmp-cmdline cmp-vsnip vim-vsnip; do git clone https://github.com/hrsh7th/${r}.git ~/.config/nvim/pack/plugins/start/${r}; done
