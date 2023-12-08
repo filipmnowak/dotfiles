@@ -1,4 +1,5 @@
 --[[
+go install golang.org/x/tools/gopls@latest
 git clone https://github.com/nvim-treesitter/nvim-treesitter.git ~/.config/nvim/pack/plugins/start/nvim-treesitter
 git clone https://github.com/neovim/nvim-lspconfig.git ~/.config/nvim/pack/plugins/start/nvim-lspconfig
 git clone https://github.com/elixir-editors/vim-elixir.git ~/.config/nvim/pack/plugins/start/vim-elixir
@@ -61,9 +62,7 @@ require'nvim-treesitter.configs'.setup {
         local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
         if ok and stats and stats.size > max_filesize then return true end
 	local _disable = {
-	  "lua",
-	  "luadoc",
-	  "xelixir"
+	  "elixir"
 	}
 	for _, v in pairs(_disable) do
           if v == lang then return true end
@@ -165,17 +164,59 @@ cmp.setup.cmdline(':', {
 -- Set up lspconfig.
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
+-- `on_attach` callback will be called after a language server
+-- instance has been attached to an open buffer with matching filetype
+-- here we're setting key mappings for hover documentation, goto definitions, goto references, etc
+-- you may set those key mappings based on your own preference
+local on_attach = function(client, bufnr)
+  local opts = { noremap=true, silent=true }
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>cr', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-f>', '<cmd>lua vim.lsp.buf.format()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>cd', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
+end
+
+
 ---[[
 require('lspconfig').elixirls.setup {
   cmd = { "/opt/elixir-ls-0.12.0/language_server.sh" },
-  -- on_attach = on_attach,
+  on_attach = on_attach,
   capabilities = capabilities
 }
 --]]
 
 ---[[
-require('lspconfig').sumneko_lua.setup  {
+util = require "lspconfig/util"
+require('lspconfig').gopls.setup {
+  cmd = {"gopls", "serve"},
+  on_attach = on_attach,
+  capabilities = capabilities,
+  filetypes = {"go", "gomod"},
+  root_dir = util.root_pattern("go.mod", ".git"),
+  settings = {
+    gopls = {
+      analyses = {
+        unusedparams = true,
+      },
+      staticcheck = true,
+    },
+  },
+}
+--]]
+
+
+---[[
+require('lspconfig').lua_ls.setup  {
   cmd = { "/opt/lua-language-server-3.7.3/bin/lua-language-server", "--logpath", "~/.local/cache/lua-language-server-3.7.3" },
+  on_attach = on_attach,
   capabilities = capabilities,
   on_init = function(client)
     local path = client.workspace_folders[1].name
