@@ -1,11 +1,19 @@
 --[[
+for r in \
+  nvim-treesitter/nvim-treesitter.git \
+  neovim/nvim-lspconfig.git \
+  elixir-editors/vim-elixir.git \
+  chrsh7th/vim-cmp \
+  chrsh7th/mp-nvim-lsp \
+  chrsh7th/mp-buffer \
+  chrsh7th/mp-path \
+  chrsh7th/mp-cmdline \
+  chrsh7th/mp-vsnip \
+  chrsh7th/vim-vsnip \
+  nvim-lua/plenary.nvim.git \
+  nvim-telescope/telescope.nvim.git
+do git clone https://github.com/${r}.git ~/.config/nvim/pack/plugins/start/$(basename $(echo ${r} | sed 's/\.git$//')); done
 go install golang.org/x/tools/gopls@latest
-git clone https://github.com/nvim-treesitter/nvim-treesitter.git ~/.config/nvim/pack/plugins/start/nvim-treesitter
-git clone https://github.com/neovim/nvim-lspconfig.git ~/.config/nvim/pack/plugins/start/nvim-lspconfig
-git clone https://github.com/elixir-editors/vim-elixir.git ~/.config/nvim/pack/plugins/start/vim-elixir
-for r in nvim-cmp cmp-nvim-lsp cmp-buffer cmp-path cmp-cmdline cmp-vsnip vim-vsnip; do git clone https://github.com/hrsh7th/${r}.git ~/.config/nvim/pack/plugins/start/${r}; done
-git clone https://github.com/nvim-lua/plenary.nvim.git ~/.config/nvim/pack/plugins/start/plenary.nvim
-git clone https://github.com/nvim-telescope/telescope.nvim.git ~/.config/nvim/pack/plugins/start/telescope.nvim
 curl https://raw.githubusercontent.com/filipmnowak/dotfiles/master/.config/nvim/init.lua -o ~/.config/nvim/init.lua
 --]]
 
@@ -63,7 +71,6 @@ require'nvim-treesitter.configs'.setup {
         local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
         if ok and stats and stats.size > max_filesize then return true end
 	local _disable = {
-	  "elixir"
 	}
 	for _, v in pairs(_disable) do
           if v == lang then return true end
@@ -193,7 +200,7 @@ end
 
 ---[[
 require('lspconfig').elixirls.setup {
-  cmd = { "/opt/elixir-ls-0.12.0/language_server.sh" },
+  cmd = { "/opt/elixir-ls-0.17.10/language_server.sh" },
   on_attach = on_attach,
   capabilities = capabilities
 }
@@ -217,7 +224,6 @@ require('lspconfig').gopls.setup {
   },
 }
 --]]
-
 
 ---[[
 require('lspconfig').lua_ls.setup  {
