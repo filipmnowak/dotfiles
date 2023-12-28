@@ -20,28 +20,31 @@ curl https://raw.githubusercontent.com/filipmnowak/dotfiles/master/.config/nvim/
 vim.cmd "set colorcolumn=128"
 vim.cmd "set ruler"
 vim.cmd "set number"
+vim.cmd "set noautoindent"
+vim.cmd "set backspace=indent,eol,start"
+vim.cmd "autocmd FileType lua setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab"
 
-require'nvim-treesitter.configs'.setup {
+require 'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all" (the five listed parsers should always be installed)
   ensure_installed = {
-	  "awk",
-	  "cmake",
-	  "eex",
-	  "erlang",
-	  "elixir",
-	  "go",
-	  "haskell",
-	  "heex",
-	  "html",
-	  "javascript",
-	  "json",
-	  "lua",
-	  "luadoc",
-	  "rust",
-	  "typescript",
-	  "vim",
-	  "vimdoc",
-	  "yaml"
+    "awk",
+    "cmake",
+    "eex",
+    "erlang",
+    "elixir",
+    "go",
+    "haskell",
+    "heex",
+    "html",
+    "javascript",
+    "json",
+    "lua",
+    "luadoc",
+    "rust",
+    "typescript",
+    "vim",
+    "vimdoc",
+    "yaml"
   },
 
   -- Install parsers synchronously (only applied to `ensure_installed`)
@@ -49,7 +52,7 @@ require'nvim-treesitter.configs'.setup {
 
   -- Automatically install missing parsers when entering buffer
   -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-  auto_install = true,
+  auto_install = false,
 
   -- List of parsers to ignore installing (or "all")
   -- ignore_install = { "javascript" },
@@ -67,16 +70,17 @@ require'nvim-treesitter.configs'.setup {
     -- disable = { "c", "rust" },
     -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
     disable = function(lang, buf)
-        local max_filesize = 100 * 1024 -- 100 KB
-        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-        if ok and stats and stats.size > max_filesize then return true end
-	local _disable = {
-	}
-	for _, v in pairs(_disable) do
-          if v == lang then return true end
-	end
+      local max_filesize = 100 * 1024   -- 100 KB
+      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+      if ok and stats and stats.size > max_filesize then return true end
+      local _disable = {
+        "lua",
+        "elixir",
+      }
+      for _, v in pairs(_disable) do
+        if v == lang then return true end
+      end
     end,
-
     -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
     -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
     -- Using this option may slow down your editor, and you may see some duplicate highlights.
@@ -95,7 +99,7 @@ local has_words_before = function()
 end
 
 -- Set up nvim-cmp.
-local cmp = require'cmp'
+local cmp = require 'cmp'
 
 cmp.setup({
   snippet = {
@@ -119,20 +123,20 @@ cmp.setup({
     ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
     ["<Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
-	cmp.select_next_item()
+        cmp.select_next_item()
       elseif vim.fn["vsnip#available"](1) == 1 then
-	feedkey("<Plug>(vsnip-expand-or-jump)", "")
+        feedkey("<Plug>(vsnip-expand-or-jump)", "")
       elseif has_words_before() then
-	cmp.complete()
+        cmp.complete()
       else
-	fallback()
+        fallback()
       end
     end, { "i", "s" }),
     ["<S-Tab>"] = cmp.mapping(function()
       if cmp.visible() then
-	cmp.select_prev_item()
+        cmp.select_prev_item()
       elseif vim.fn["vsnip#jumpable"](-1) == 1 then
-	feedkey("<Plug>(vsnip-jump-prev)", "")
+        feedkey("<Plug>(vsnip-jump-prev)", "")
       end
     end, { "i", "s" })
   }),
@@ -182,7 +186,7 @@ local capabilities = require('cmp_nvim_lsp').default_capabilities()
 -- here we're setting key mappings for hover documentation, goto definitions, goto references, etc
 -- you may set those key mappings based on your own preference
 local on_attach = function(client, bufnr)
-  local opts = { noremap=true, silent=true }
+  local opts = { noremap = true, silent = true }
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
@@ -209,10 +213,10 @@ require('lspconfig').elixirls.setup {
 ---[[
 util = require "lspconfig/util"
 require('lspconfig').gopls.setup {
-  cmd = {"gopls", "serve"},
+  cmd = { "gopls", "serve" },
   on_attach = on_attach,
   capabilities = capabilities,
-  filetypes = {"go", "gomod"},
+  filetypes = { "go", "gomod" },
   root_dir = util.root_pattern("go.mod", ".git"),
   settings = {
     gopls = {
@@ -226,15 +230,31 @@ require('lspconfig').gopls.setup {
 --]]
 
 ---[[
-require('lspconfig').lua_ls.setup  {
-  cmd = { "/opt/lua-language-server-3.7.3/bin/lua-language-server", "--logpath", "~/.local/cache/lua-language-server-3.7.3" },
+require('lspconfig').lua_ls.setup {
+  cmd = {
+    "/opt/lua-language-server-3.7.3/bin/lua-language-server",
+    "--logpath", "~/.local/cache/lua-language-server-3.7.3/log",
+    "--metapath", "~/.local/cache/lua-language-server-3.7.3/meta",
+    -- "--loglevel", "trace",
+  },
   on_attach = on_attach,
   capabilities = capabilities,
   on_init = function(client)
     local path = client.workspace_folders[1].name
-    if not vim.loop.fs_stat(path..'/.luarc.json') and not vim.loop.fs_stat(path..'/.luarc.jsonc') then
+    if not vim.loop.fs_stat(path .. '/.luarc.json') and not vim.loop.fs_stat(path .. '/.luarc.jsonc') then
       client.config.settings = vim.tbl_deep_extend('force', client.config.settings, {
         Lua = {
+          format = {
+            enable = true,
+            -- it's overriden by neovim settings, see lua-related autocmd.
+            defaultConfig = {
+              indent_style = "space",
+              indent_size = "2",
+            },
+          },
+          -- diagnostics = {
+          --  globals = {'vim'},
+          --},
           runtime = {
             -- Tell the language server which version of Lua you're using
             -- (most likely LuaJIT in the case of Neovim)
@@ -242,7 +262,7 @@ require('lspconfig').lua_ls.setup  {
           },
           telemetry = {
             enable = false
-	  },
+          },
           -- Make the server aware of Neovim runtime files
           workspace = {
             checkThirdParty = false,
