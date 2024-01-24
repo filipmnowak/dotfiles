@@ -1,18 +1,18 @@
 --[[
 for r in \
-  nvim-treesitter/nvim-treesitter.git \
-  neovim/nvim-lspconfig.git \
-  elixir-editors/vim-elixir.git \
-  chrsh7th/vim-cmp \
-  chrsh7th/mp-nvim-lsp \
-  chrsh7th/mp-buffer \
-  chrsh7th/mp-path \
-  chrsh7th/mp-cmdline \
-  chrsh7th/mp-vsnip \
-  chrsh7th/vim-vsnip \
-  nvim-lua/plenary.nvim.git \
-  nvim-telescope/telescope.nvim.git
-do git clone https://github.com/${r}.git ~/.config/nvim/pack/plugins/start/$(basename $(echo ${r} | sed 's/\.git$//')); done
+  nvim-treesitter/nvim-treesitter \
+  neovim/nvim-lspconfig \
+  elixir-editors/vim-elixir \
+  hrsh7th/vim-cmp \
+  hrsh7th/cmp-nvim-lsp \
+  hrsh7th/cmp-buffer \
+  hrsh7th/cmp-path \
+  hrsh7th/cmp-cmdline \
+  hrsh7th/cmp-vsnip \
+  hrsh7th/vim-vsnip \
+  nvim-lua/plenary.nvim \
+  nvim-telescope/telescope.nvim
+do git clone https://github.com/${r}.git ~/.config/nvim/pack/plugins/start/$(basename ${r}); done
 go install golang.org/x/tools/gopls@latest
 curl https://raw.githubusercontent.com/filipmnowak/dotfiles/master/.config/nvim/init.lua -o ~/.config/nvim/init.lua
 --]]
