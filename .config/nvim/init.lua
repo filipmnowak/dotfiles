@@ -23,6 +23,12 @@ vim.cmd "set number"
 vim.cmd "set noautoindent"
 vim.cmd "set backspace=indent,eol,start"
 vim.cmd "autocmd FileType lua setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab"
+vim.cmd "autocmd FileType html setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab"
+vim.cmd "autocmd FileType sh setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab"
+vim.cmd "cabbr Q q"
+vim.cmd "cabbr W w"
+vim.cmd "cabbr WQ wq"
+vim.cmd "cabbr Wq wq"
 
 require 'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all" (the five listed parsers should always be installed)
