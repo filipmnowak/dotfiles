@@ -3,7 +3,7 @@ for r in \
   nvim-treesitter/nvim-treesitter \
   neovim/nvim-lspconfig \
   elixir-editors/vim-elixir \
-  hrsh7th/nvim-cmp \
+  hrsh7th/vim-cmp \
   hrsh7th/cmp-nvim-lsp \
   hrsh7th/cmp-buffer \
   hrsh7th/cmp-path \
@@ -25,8 +25,8 @@ vim.cmd "set backspace=indent,eol,start"
 vim.cmd "autocmd FileType lua setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab"
 vim.cmd "autocmd FileType html setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab"
 vim.cmd "autocmd FileType sh setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab"
-vim.cmd "cabbr Q q"
 vim.cmd "cabbr W w"
+vim.cmd "cabbr Q q"
 vim.cmd "cabbr WQ wq"
 vim.cmd "cabbr Wq wq"
 
@@ -76,7 +76,7 @@ require 'nvim-treesitter.configs'.setup {
     -- disable = { "c", "rust" },
     -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
     disable = function(lang, buf)
-      local max_filesize = 100 * 1024   -- 100 KB
+      local max_filesize = 100 * 1024 -- 100 KB
       local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
       if ok and stats and stats.size > max_filesize then return true end
       local _disable = {
@@ -207,17 +207,28 @@ local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
 end
 
-
 ---[[
 require('lspconfig').elixirls.setup {
-  cmd = { "/opt/elixir-ls-0.17.10/language_server.sh" },
+  cmd = { "/opt/elixir-ls-0.19.0/language_server.sh" },
   on_attach = on_attach,
   capabilities = capabilities
 }
 --]]
 
+local util = require "lspconfig/util"
+
+--[[
+require('lspconfig').lexical.setup {
+  cmd = { "/opt/lexical-v0.6.1/bin/start_lexical.sh" },
+  root_dir = function(fname)
+    return util.root_pattern("mix.exs", ".git")(fname) or vim.loop.cwd()
+  end,
+  filetypes = { "elixir", "eelixir", "heex" },
+  settings = {},
+}
+--]]
+
 ---[[
-util = require "lspconfig/util"
 require('lspconfig').gopls.setup {
   cmd = { "gopls", "serve" },
   on_attach = on_attach,
