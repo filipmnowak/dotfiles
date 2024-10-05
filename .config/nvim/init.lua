@@ -269,9 +269,10 @@ require('lspconfig').lua_ls.setup {
               indent_size = "2",
             },
           },
-          -- diagnostics = {
-          --  globals = {'vim'},
-          --},
+          diagnostics = {
+            disable = {"lowercase-global"},
+            globals = {"vim", "love"},
+          },
           runtime = {
             -- Tell the language server which version of Lua you're using
             -- (most likely LuaJIT in the case of Neovim)
