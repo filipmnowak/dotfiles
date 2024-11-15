@@ -17,6 +17,9 @@ go install golang.org/x/tools/gopls@latest
 curl https://raw.githubusercontent.com/filipmnowak/dotfiles/master/.config/nvim/init.lua -o ~/.config/nvim/init.lua
 --]]
 
+vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+
 vim.cmd "set colorcolumn=128"
 vim.cmd "set ruler"
 vim.cmd "set number"
