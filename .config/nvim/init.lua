@@ -17,15 +17,14 @@ go install golang.org/x/tools/gopls@latest
 curl https://raw.githubusercontent.com/filipmnowak/dotfiles/master/.config/nvim/init.lua -o ~/.config/nvim/init.lua
 --]]
 
-
 vim.opt.termguicolors = true
 vim.cmd 'colorscheme evening'
-
 vim.cmd "set colorcolumn=128"
 
 -- transparency
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none" })
 
 vim.cmd "set ruler"
 vim.cmd "set number"
