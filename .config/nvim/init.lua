@@ -17,10 +17,16 @@ go install golang.org/x/tools/gopls@latest
 curl https://raw.githubusercontent.com/filipmnowak/dotfiles/master/.config/nvim/init.lua -o ~/.config/nvim/init.lua
 --]]
 
+
+vim.opt.termguicolors = true
+vim.cmd 'colorscheme evening'
+
+vim.cmd "set colorcolumn=128"
+
+-- transparency
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 
-vim.cmd "set colorcolumn=128"
 vim.cmd "set ruler"
 vim.cmd "set number"
 vim.cmd "set noautoindent"
@@ -84,7 +90,6 @@ require 'nvim-treesitter.configs'.setup {
       if ok and stats and stats.size > max_filesize then return true end
       local _disable = {
         "lua",
-        "elixir",
       }
       for _, v in pairs(_disable) do
         if v == lang then return true end
@@ -222,7 +227,7 @@ local util = require "lspconfig/util"
 
 --[[
 require('lspconfig').lexical.setup {
-  cmd = { "/opt/lexical-v0.6.1/bin/start_lexical.sh" },
+  cmd = { "/opt/lexical-v0.7.0/bin/start_lexical.sh" },
   root_dir = function(fname)
     return util.root_pattern("mix.exs", ".git")(fname) or vim.loop.cwd()
   end,
