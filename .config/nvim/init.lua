@@ -216,7 +216,7 @@ end
 
 ---[[
 require('lspconfig').elixirls.setup {
-  cmd = { "/opt/elixir-ls-v0.24.1/language_server.sh" },
+  cmd = { "/opt/elixir-ls/language_server.sh" },
   on_attach = on_attach,
   capabilities = capabilities
 }
