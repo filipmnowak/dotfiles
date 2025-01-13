@@ -28,6 +28,7 @@ vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none" })
 
 vim.cmd "set ruler"
 vim.cmd "set number"
+vim.cmd "set nohlsearch"
 vim.cmd "set noautoindent"
 vim.cmd "set backspace=indent,eol,start"
 vim.cmd "autocmd FileType lua setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab"
