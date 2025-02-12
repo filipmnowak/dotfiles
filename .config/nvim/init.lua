@@ -3,7 +3,7 @@ for r in \
   nvim-treesitter/nvim-treesitter \
   neovim/nvim-lspconfig \
   elixir-editors/vim-elixir \
-  hrsh7th/vim-cmp \
+  hrsh7th/nvim-cmp \
   hrsh7th/cmp-nvim-lsp \
   hrsh7th/cmp-buffer \
   hrsh7th/cmp-path \
