@@ -20,6 +20,7 @@ curl https://raw.githubusercontent.com/filipmnowak/dotfiles/master/.config/nvim/
 vim.opt.termguicolors = true
 vim.cmd 'colorscheme evening'
 vim.cmd "set colorcolumn=128"
+vim.cmd 'set mouse='
 
 -- transparency
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
@@ -29,6 +30,7 @@ vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none" })
 vim.cmd "set ruler"
 vim.cmd "set number"
 vim.cmd "set noautoindent"
+vim.cmd "set nohlsearch"
 vim.cmd "set backspace=indent,eol,start"
 vim.cmd "autocmd FileType lua setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab"
 vim.cmd "autocmd FileType html setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab"
@@ -256,9 +258,9 @@ require('lspconfig').gopls.setup {
 ---[[
 require('lspconfig').lua_ls.setup {
   cmd = {
-    "/opt/lua-language-server-3.7.3/bin/lua-language-server",
-    "--logpath", "~/.local/cache/lua-language-server-3.7.3/log",
-    "--metapath", "~/.local/cache/lua-language-server-3.7.3/meta",
+    "/opt/lua-language-server/bin/lua-language-server",
+    "--logpath", "~/.local/cache/lua-language-server/log",
+    "--metapath", "~/.local/cache/lua-language-server/meta",
     -- "--loglevel", "trace",
   },
   on_attach = on_attach,
