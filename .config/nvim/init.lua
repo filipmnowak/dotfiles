@@ -21,6 +21,7 @@ vim.opt.termguicolors = true
 vim.cmd 'colorscheme evening'
 vim.cmd "set colorcolumn=128"
 vim.cmd 'set mouse='
+vim.cmd ':set maxmempattern=5000'
 
 -- transparency
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
