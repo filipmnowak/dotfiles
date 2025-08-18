@@ -27,6 +27,16 @@ vim.cmd ':set maxmempattern=5000'
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none" })
+-- hightlight trailing whitespaces
+-- courtesy of https://www.manjotbal.ca/blog/neovim-whitespace.html
+vim.api.nvim_set_hl(0, 'TrailingWhitespace', { bg='DarkRed' })
+vim.api.nvim_create_autocmd('BufEnter', {
+	pattern = '*',
+	command = [[
+		syntax clear TrailingWhitespace |
+		syntax match TrailingWhitespace "\_s\+$"
+	]]}
+)
 
 vim.cmd "set ruler"
 vim.cmd "set number"
